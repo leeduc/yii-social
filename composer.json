@@ -28,9 +28,4 @@
         	"leeduc\\authclient\\": "auth/"
         }
     },
-    "extra": {
-        "branch-alias": {
-            "dev-master": "dev"
-        }
-    }
 }
