@@ -5,10 +5,11 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\authclient\clients;
+namespace leeduc\authclient\clients;
 
 use yii\authclient\OAuth2;
-
+use yii\authclient\OAuthToken;
+use leeduc\authclient\SocialInterface;
 /**
  * GoogleOAuth allows authentication via Google OAuth.
  *
@@ -22,10 +23,10 @@ use yii\authclient\OAuth2;
  * ~~~
  * 'components' => [
  *     'authClientCollection' => [
- *         'class' => 'yii\authclient\Collection',
+ *         'class' => 'leeduc\authclient\Collection',
  *         'clients' => [
  *             'google' => [
- *                 'class' => 'yii\authclient\clients\GoogleOAuth',
+ *                 'class' => 'leeduc\authclient\clients\GoogleOAuth',
  *                 'clientId' => 'google_client_id',
  *                 'clientSecret' => 'google_client_secret',
  *             ],
@@ -40,7 +41,7 @@ use yii\authclient\OAuth2;
  * @author Paul Klimov <klimov.paul@gmail.com>
  * @since 2.0
  */
-class GoogleOAuth extends OAuth2
+class GoogleOAuth extends OAuth2 implements SocialInterface
 {
     /**
      * @inheritdoc
@@ -55,7 +56,7 @@ class GoogleOAuth extends OAuth2
      */
     public $apiBaseUrl = 'https://www.googleapis.com/plus/v1';
 
-
+    public $scope = 'https://www.googleapis.com/auth/plus.login https://www.googleapis.com/auth/plus.me https://www.googleapis.com/auth/plus.stream.write';
     /**
      * @inheritdoc
      */
@@ -92,5 +93,90 @@ class GoogleOAuth extends OAuth2
     protected function defaultTitle()
     {
         return 'Google';
+    }
+
+    public function redirectAuth(array $params = array())
+    {
+        $a = $this->buildAuthUrl($params);
+        $b = \Yii::$app->getResponse()->redirect($a);
+        $this->redirect($b);
+    }
+
+    /**
+     * refresh google token
+     * @param  OAuthToken $token Token object
+     * @return obj               Token object
+     */
+    public function refreshAccessToken(OAuthToken $token)
+    {
+        $params = [
+            'client_id' => $this->clientId,
+            'client_secret' => $this->clientSecret,
+            'grant_type' => 'refresh_token'
+        ];
+        $params = array_merge($token->getParams(), $params);
+        unset($params['expires_in']);
+        unset($params['token_type']);
+        unset($params['id_token']);
+        unset($params['access_token']);
+        $response = $this->sendRequest('POST', $this->tokenUrl, $params);
+
+        $token = $this->createToken(['params' => $response]);
+        $this->setAccessToken($token);
+
+        return $token;
+    }
+
+    /**
+     * get you info
+     * @param  array  $params params for query
+     * @return json           data
+     */
+    public function getMeProfile(array $params = array())
+    {
+        return $this->api('people/me','GET',$params);
+    }
+
+    /**
+     * get time line of me
+     * @param  array  $params params for query
+     * @return json           data
+     */
+    public function getMeTimeline(array $params = array())
+    {
+        return $this->api('people/me/activities/public','GET',$params);
+    }
+
+    /**
+     * get timeline of user
+     * @param  int    $user_id  user id
+     * @param  string $username user screen name
+     * @return json             data
+     */
+    public function getUserTimeline($user_id = null,array $params = array())
+    {
+        return $this->api('people/'.$user_id.'/activities/public','GET',$params);
+    }
+
+    /**
+     * get user profile
+     * @param  int    $user_id  user id
+     * @param  string $username user screen name
+     * @return json             data
+     */
+    public function getUserProfile($user_id = null,array $params = array())
+    {
+        return $this->api('people/'.$user_id,'GET', array_merge($params,[
+        ]));
+    }
+
+    /**
+     * get post detail
+     * @param  int    $id post id
+     * @return json       data
+     */
+    public function getPostDetail($post_id, array $params = array())
+    {
+        return $this->api('activities/'.$post_id,'GET',$params);
     }
 }

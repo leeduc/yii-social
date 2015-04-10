@@ -5,7 +5,7 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\authclient\clients;
+namespace leeduc\authclient\clients;
 
 use yii\authclient\OAuth2;
 

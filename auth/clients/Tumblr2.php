@@ -1,8 +1,9 @@
 <?php
-namespace yii\authclient\clients;
+namespace leeduc\authclient\clients;
 
 use yii\authclient\OAuth1;
-class Tumblr2 extends OAuth1
+use leeduc\authclient\SocialInterface;
+class Tumblr2 extends OAuth1 implements SocialInterface
 {
     /**
      * @inheritdoc
@@ -29,6 +30,9 @@ class Tumblr2 extends OAuth1
      */
     public $apiBaseUrl = 'http://api.tumblr.com/v2';
 
+    public $access_token;
+
+    public $access_token_secret;
 
     /**
      * @inheritdoc
@@ -54,8 +58,80 @@ class Tumblr2 extends OAuth1
         return 'Tumblr';
     }
 
-    public function getToken()
+    /**
+     * get component set to class
+     */
+    public function setToken()
     {
-        return $this->_accessToken;
+        $token = new \yii\authclient\OAuthToken([
+            'token' => $this->access_token,
+            'tokenSecret' => $this->access_token_secret
+        ]);
+        return $this->setAccessToken($token);
+    }
+
+    /**
+     * set key and call tumblr sdk
+     * @return obj Tumblr Object
+     */
+    public function getTumblr()
+    {
+        $tumblr = new \Tumblr\API\Client($this->consumerKey, $this->consumerSecret);
+        $tumblr->setToken($this->getAccessToken()->getToken(), $this->getAccessToken()->getTokenSecret());
+        return $tumblr;
+    }
+
+    /**
+     * get your info
+     * @param  array  $params options for query
+     * @return json           data
+     */
+    public function getMeProfile(array $params = array())
+    {
+        return $this->getTumblr()->getUserInfo();
+    }
+
+    /**
+     * get your timeline
+     * @param  array  $params options for query
+     * @return json           data
+     */
+    public function getMeTimeline(array $params = array())
+    {
+        return $this->getTumblr()->getDashboardPosts();
+    }
+
+    /**
+     * get profile user
+     * @param  string $blogName name of blog
+     * @param  array  $params   options for query
+     * @return json             data
+     */
+    public function getUserProfile($blogName,array $params = array())
+    {
+        return $this->getTumblr()->getBlogInfo($blogName,$params);
+    }
+
+    /**
+     * get timeline of user
+     * @param  string $blogName name of blog
+     * @param  array  $params   options for query
+     * @return json             data
+     */
+    public function getUserTimeline($blogName,array $params = array())
+    {
+        return $this->getTumblr()->getBlogPosts($blogName,$params);
+    }
+
+    /**
+     * get post detail
+     * @param  string $blogName name of blog
+     * @param  array  $params   option for query
+     *         id               id of post
+     * @return json             data
+     */
+    public function getPostDetail($blogName, array $params = array())
+    {
+        return $this->getTumblr()->getBlogPosts($blogName,$params);
     }
 }
