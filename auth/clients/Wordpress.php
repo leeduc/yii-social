@@ -5,10 +5,10 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\authclient\clients;
+namespace leeduc\authclient\clients;
 
 use yii\authclient\OAuth2;
-
+use yii\authclient\OAuthToken;
 /**
  * Facebook allows authentication via Facebook OAuth.
  *
@@ -79,5 +79,22 @@ class Wordpress extends OAuth2
     protected function defaultTitle()
     {
         return 'Wordpress';
+    }
+
+    public function refreshAccessToken(OAuthToken $token,$_params = array())
+    {
+        $params = [
+            'client_id' => $this->clientId,
+            'client_secret' => $this->clientSecret,
+            'grant_type' => 'refresh_token'
+        ];
+        $params = array_merge($token->getParams(), $params);
+        $params = array_merge($params, $_params);
+        $response = $this->sendRequest('POST', $this->tokenUrl, $params);
+
+        $token = $this->createToken(['params' => $response]);
+        $this->setAccessToken($token);
+
+        return $token;
     }
 }

@@ -5,7 +5,7 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\authclient\clients;
+namespace leeduc\authclient\clients;
 
 use yii\authclient\OAuth1;
 
@@ -19,10 +19,10 @@ use yii\authclient\OAuth1;
  * ~~~
  * 'components' => [
  *     'authClientCollection' => [
- *         'class' => 'yii\authclient\Collection',
+ *         'class' => 'leeduc\authclient\Collection',
  *         'clients' => [
  *             'twitter' => [
- *                 'class' => 'yii\authclient\clients\Twitter',
+ *                 'class' => 'leeduc\authclient\clients\Twitter',
  *                 'consumerKey' => 'twitter_consumer_key',
  *                 'consumerSecret' => 'twitter_consumer_secret',
  *             ],
@@ -35,8 +35,8 @@ use yii\authclient\OAuth1;
  * @see https://dev.twitter.com/apps/new
  * @see https://dev.twitter.com/docs/api
  *
- * @author Paul Klimov <klimov.paul@gmail.com>
- * @since 2.0
+ * @author Le Duc <lee.duc55@gmail.com>
+ * @since 1.0
  */
 class Twitter extends OAuth1
 {
@@ -64,7 +64,14 @@ class Twitter extends OAuth1
      * @inheritdoc
      */
     public $apiBaseUrl = 'https://api.twitter.com/1.1';
-
+    /**
+     * access token for app
+     */
+    public $access_token;
+    /**
+     * access token sercet for app
+     */
+    public $access_token_secret;
 
     /**
      * @inheritdoc
@@ -88,5 +95,88 @@ class Twitter extends OAuth1
     protected function defaultTitle()
     {
         return 'Twitter';
+    }
+
+    /**
+     * setToken from component to controller
+     * @param string $access_token        access token
+     * @param string $access_token_secret secret access token
+     */
+    public function setToken($access_token = null, $access_token_secret = null)
+    {
+        $token = new \yii\authclient\OAuthToken([
+            'token' => ($access_token) ? $access_token : $this->access_token,
+            'tokenSecret' => ($access_token_secret) ? $access_token_secret : $this->access_token_secret
+        ]);
+        $this->setAccessToken($token);
+    }
+
+    /**
+     * redirect url to auth of twitter
+     */
+    public function redirectAuth()
+    {
+        $data = $this->fetchRequestToken();
+        $a = $this->buildAuthUrl($data);
+        $b = \Yii::$app->getResponse()->redirect($a);
+        $this->redirect($b);
+    }
+
+    /**
+     * get you info
+     * @param  array  $params params for query
+     * @return json           data
+     */
+    public function getMeProfile(array $params = array())
+    {
+        return $this->api('account/verify_credentials.json','GET',$params);
+    }
+
+    /**
+     * get time line of me
+     * @param  array  $params params for query
+     * @return json           data
+     */
+    public function getMeTimeline(array $params = array())
+    {
+        return $this->api('statuses/home_timeline.json','GET',$params);
+    }
+
+    /**
+     * get timeline of user
+     * @param  int    $user_id  user id
+     * @param  string $username user screen name
+     * @return json             data
+     */
+    public function getUserTimeline($user_id = null,array $params = array())
+    {
+        return $this->api('statuses/user_timeline.json','GET',array_merge([
+            'user_id' => $user_id,
+        ],$params));
+    }
+
+    /**
+     * get user profile
+     * @param  int    $user_id  user id
+     * @param  string $username user screen name
+     * @return json             data
+     */
+    public function getUserProfile($user_id = null,array $params = array())
+    {
+        return $this->api('users/show.json','GET', array_merge([
+            'user_id' => $user_id,
+        ],$params));
+    }
+
+    /**
+     * get post detail
+     * @param  int    $id post id
+     * @return json       data
+     */
+    public function getPostDetail($post_id, array $params)
+    {
+        return $this->api('statuses/show.json','GET',array_merge([
+            'id' => $id,
+        ],$params));
     }
 }
