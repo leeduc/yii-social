@@ -56,7 +56,6 @@ class GoogleOAuth extends OAuth2 implements SocialInterface
      */
     public $apiBaseUrl = 'https://www.googleapis.com/plus/v1';
 
-    public $scope = 'https://www.googleapis.com/auth/plus.login https://www.googleapis.com/auth/plus.me https://www.googleapis.com/auth/plus.stream.write';
     /**
      * @inheritdoc
      */
@@ -65,8 +64,9 @@ class GoogleOAuth extends OAuth2 implements SocialInterface
         parent::init();
         if ($this->scope === null) {
             $this->scope = implode(' ', [
-                'profile',
-                'email',
+                'https://www.googleapis.com/auth/plus.login',
+                'https://www.googleapis.com/auth/plus.me',
+                'https://www.googleapis.com/auth/plus.stream.write'
             ]);
         }
     }
