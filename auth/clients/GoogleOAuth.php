@@ -56,6 +56,10 @@ class GoogleOAuth extends OAuth2 implements SocialInterface
      */
     public $apiBaseUrl = 'https://www.googleapis.com/plus/v1';
 
+    public $access_token;
+    public $refresh_token;
+    public $id_token;
+    public $expires_in;
     /**
      * @inheritdoc
      */
@@ -109,18 +113,21 @@ class GoogleOAuth extends OAuth2 implements SocialInterface
      * @param  OAuthToken $token Token object
      * @return obj               Token object
      */
-    public function refreshAccessToken(OAuthToken $token)
+    public function refreshAccessToken(\yii\authclient\OAuthToken $token)
     {
+        $this->setAccessToken($token);
+
         $params = [
             'client_id' => $this->clientId,
             'client_secret' => $this->clientSecret,
-            'grant_type' => 'refresh_token'
+            'grant_type' => 'refresh_token',
+            'refresh_token' => $this->refresh_token,
         ];
-        $params = array_merge($token->getParams(), $params);
-        unset($params['expires_in']);
-        unset($params['token_type']);
-        unset($params['id_token']);
-        unset($params['access_token']);
+        // $params = array_merge($token->getParams(), $params);
+        // unset($params['expires_in']);
+        // unset($params['token_type']);
+        // unset($params['id_token']);
+        // unset($params['access_token']);
         $response = $this->sendRequest('POST', $this->tokenUrl, $params);
 
         $token = $this->createToken(['params' => $response]);

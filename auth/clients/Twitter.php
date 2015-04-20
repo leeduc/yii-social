@@ -173,10 +173,17 @@ class Twitter extends OAuth1
      * @param  int    $id post id
      * @return json       data
      */
-    public function getPostDetail($post_id, array $params)
+    public function getPostDetail($id, array $params)
     {
         return $this->api('statuses/show.json','GET',array_merge([
             'id' => $id,
+        ],$params));
+    }
+
+    public function getPagePosts($name,$params = array())
+    {
+        return $this->api('statuses/user_timeline.json','GET',array_merge([
+            'screen_name' => $name,
         ],$params));
     }
 }

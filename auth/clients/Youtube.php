@@ -56,6 +56,11 @@ class Youtube extends OAuth2
      */
     public $apiBaseUrl = 'https://www.googleapis.com/youtube/v3';
 
+    public $token_type;
+    public $access_token;
+    public $refresh_token;
+    public $id_token;
+    public $expires_in;
 
     /**
      * @inheritdoc
@@ -97,6 +102,34 @@ class Youtube extends OAuth2
     protected function defaultTitle()
     {
         return 'Youtube';
+    }
+
+    /**
+     * refresh google token
+     * @param  OAuthToken $token Token object
+     * @return obj               Token object
+     */
+    public function refreshAccessToken(\yii\authclient\OAuthToken $token)
+    {
+        $this->setAccessToken($token);
+
+        $params = [
+            'client_id' => $this->clientId,
+            'client_secret' => $this->clientSecret,
+            'grant_type' => 'refresh_token',
+            'refresh_token' => $this->refresh_token,
+        ];
+        // $params = array_merge($token->getParams(), $params);
+        // unset($params['expires_in']);
+        // unset($params['token_type']);
+        // unset($params['id_token']);
+        // unset($params['access_token']);
+        $response = $this->sendRequest('POST', $this->tokenUrl, $params);
+
+        $token = $this->createToken(['params' => $response]);
+        $this->setAccessToken($token);
+
+        return $token;
     }
 
     /**
