@@ -56,7 +56,7 @@ class Facebook extends OAuth2 implements SocialInterface
     /**
      * @inheritdoc
      */
-    public $scope = 'publish_pages,publish_actions,read_stream,email,user_likes,manage_pages,user_friends';
+    public $scope = 'publish_pages,publish_actions,read_stream,email,user_likes,manage_pages';
 
     /**
      * @inheritdoc
@@ -110,6 +110,16 @@ class Facebook extends OAuth2 implements SocialInterface
     public function getMeAccount(array $params = array())
     {
         return $this->api('me/accounts','GET',$params);
+    }
+
+    /**
+     * meAccount get pages of me
+     * @param  array  $params params for query
+     * @return json   data
+     */
+    public function getUserAccount($id, array $params = array())
+    {
+        return $this->api($id.'/accounts','GET',$params);
     }
 
     /**
