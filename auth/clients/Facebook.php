@@ -266,7 +266,7 @@ class Facebook extends OAuth2 implements SocialInterface
             throw new Exception('Curl error requesting "' .  $url . '": #' . $errorNumber . ' - ' . $errorMessage);
         }
         if (strncmp($responseHeaders['http_code'], '20', 2) !== 0) {
-            throw new InvalidResponseException($responseHeaders, $response, 'Request failed with code: ' . $responseHeaders['http_code'] . ', message: ' . $response);
+            throw new \yii\authclient\InvalidResponseException($responseHeaders, $response, 'Request failed with code: ' . $responseHeaders['http_code'] . ', message: ' . $response);
         }
         return $response;
     }

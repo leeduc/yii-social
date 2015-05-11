@@ -72,7 +72,8 @@ class GoogleOAuth extends OAuth2 implements SocialInterface
                 'https://www.googleapis.com/auth/plus.me',
                 'https://www.googleapis.com/auth/userinfo.email',
                 'https://www.googleapis.com/auth/userinfo.profile',
-                'https://www.googleapis.com/auth/plus.stream.write'
+                'https://www.googleapis.com/auth/plus.stream.write',
+                'https://www.googleapis.com/auth/plus.pages.manage',
             ]);
         }
     }
