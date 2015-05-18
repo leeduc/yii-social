@@ -106,7 +106,7 @@ class Twitter extends OAuth1
     {
         $token = new \yii\authclient\OAuthToken([
             'token' => ($access_token) ? $access_token : $this->access_token,
-            'tokenSecret' => ($access_token_secret) ? $access_token_secret : $this->access_token_secret
+            'tokenSecret' => ($access_token_secret) ? $access_token_secret : $this->access_token_secret,
         ]);
         $this->setAccessToken($token);
     }
@@ -129,7 +129,7 @@ class Twitter extends OAuth1
      */
     public function getMeProfile(array $params = array())
     {
-        return $this->api('account/verify_credentials.json','GET',$params);
+        return $this->api('account/verify_credentials.json', 'GET', $params);
     }
 
     /**
@@ -139,7 +139,7 @@ class Twitter extends OAuth1
      */
     public function getMeTimeline(array $params = array())
     {
-        return $this->api('statuses/home_timeline.json','GET',$params);
+        return $this->api('statuses/home_timeline.json', 'GET', $params);
     }
 
     /**
@@ -148,11 +148,11 @@ class Twitter extends OAuth1
      * @param  string $username user screen name
      * @return json             data
      */
-    public function getUserTimeline($user_id = null,array $params = array())
+    public function getUserTimeline($user_id = null, array $params = array())
     {
-        return $this->api('statuses/user_timeline.json','GET',array_merge([
+        return $this->api('statuses/user_timeline.json', 'GET', array_merge([
             'user_id' => $user_id,
-        ],$params));
+        ], $params));
     }
 
     /**
@@ -161,11 +161,11 @@ class Twitter extends OAuth1
      * @param  string $username user screen name
      * @return json             data
      */
-    public function getUserProfile($user_id = null,array $params = array())
+    public function getUserProfile($user_id = null, array $params = array())
     {
-        return $this->api('users/show.json','GET', array_merge([
+        return $this->api('users/show.json', 'GET', array_merge([
             'user_id' => $user_id,
-        ],$params));
+        ], $params));
     }
 
     /**
@@ -173,17 +173,24 @@ class Twitter extends OAuth1
      * @param  int    $id post id
      * @return json       data
      */
-    public function getPostDetail($id, array $params)
+    public function getPostDetail($id, array $params = array())
     {
-        return $this->api('statuses/show.json','GET',array_merge([
+        return $this->api('statuses/show.json', 'GET', array_merge([
             'id' => $id,
-        ],$params));
+        ], $params));
     }
 
-    public function getPagePosts($name,$params = array())
+    public function getPagePosts($name, array $params = array())
     {
-        return $this->api('statuses/user_timeline.json','GET',array_merge([
+        return $this->api('statuses/user_timeline.json', 'GET', array_merge([
             'screen_name' => $name,
-        ],$params));
+        ], $params));
+    }
+
+    public function postReplyComment($id, array $params = array())
+    {
+        return $this->api('statuses/update.json', 'POST', array_merge([
+            'in_reply_to_status_id' => $id,
+        ], $params));
     }
 }

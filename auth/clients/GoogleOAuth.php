@@ -7,9 +7,10 @@
 
 namespace leeduc\authclient\clients;
 
+use leeduc\authclient\SocialInterface;
 use yii\authclient\OAuth2;
 use yii\authclient\OAuthToken;
-use leeduc\authclient\SocialInterface;
+
 /**
  * GoogleOAuth allows authentication via Google OAuth.
  *
@@ -144,7 +145,7 @@ class GoogleOAuth extends OAuth2 implements SocialInterface
      */
     public function getMeProfile(array $params = array())
     {
-        return $this->api('people/me','GET',$params);
+        return $this->api('people/me', 'GET', $params);
     }
 
     /**
@@ -154,7 +155,7 @@ class GoogleOAuth extends OAuth2 implements SocialInterface
      */
     public function getMeTimeline(array $params = array())
     {
-        return $this->api('people/me/activities/public','GET',$params);
+        return $this->api('people/me/activities/public', 'GET', $params);
     }
 
     /**
@@ -163,9 +164,9 @@ class GoogleOAuth extends OAuth2 implements SocialInterface
      * @param  string $username user screen name
      * @return json             data
      */
-    public function getUserTimeline($user_id = null,array $params = array())
+    public function getUserTimeline($user_id = null, array $params = array())
     {
-        return $this->api('people/'.$user_id.'/activities/public','GET',$params);
+        return $this->api('people/' . $user_id . '/activities/public', 'GET', $params);
     }
 
     /**
@@ -174,9 +175,9 @@ class GoogleOAuth extends OAuth2 implements SocialInterface
      * @param  string $username user screen name
      * @return json             data
      */
-    public function getUserProfile($user_id = null,array $params = array())
+    public function getUserProfile($user_id = null, array $params = array())
     {
-        return $this->api('people/'.$user_id,'GET', array_merge($params,[
+        return $this->api('people/' . $user_id, 'GET', array_merge($params, [
         ]));
     }
 
@@ -187,6 +188,18 @@ class GoogleOAuth extends OAuth2 implements SocialInterface
      */
     public function getPostDetail($post_id, array $params = array())
     {
-        return $this->api('activities/'.$post_id,'GET',$params);
+        return $this->api('activities/' . $post_id, 'GET', $params);
+    }
+
+    /**
+     * create post comment
+     * @param  int    $id post id
+     * @return json       data
+     */
+    public function createComment($post_id, $comments ,array $params = array())
+    {
+        return $this->api('activities/'.$post_id.'/comments', 'POST', ['key' => 'AIzaSyDqGgMh84wZcS34yW3iopcHF-3xyezQBrM'],[
+                    'object' => ['originalContent' => $comments]
+                ]);
     }
 }

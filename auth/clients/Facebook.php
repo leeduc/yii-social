@@ -7,9 +7,10 @@
 
 namespace leeduc\authclient\clients;
 
+use leeduc\authclient\SocialInterface;
 use yii\authclient\OAuth2;
 use yii\authclient\OAuthToken;
-use leeduc\authclient\SocialInterface;
+
 /**
  * Facebook allows authentication via Facebook OAuth.
  *
@@ -99,7 +100,7 @@ class Facebook extends OAuth2 implements SocialInterface
      */
     public function getMeProfile(array $params = array())
     {
-        return $this->api('me','GET',$params);
+        return $this->api('me', 'GET', $params);
     }
 
     /**
@@ -109,7 +110,7 @@ class Facebook extends OAuth2 implements SocialInterface
      */
     public function getMeAccount(array $params = array())
     {
-        return $this->api('me/accounts','GET',$params);
+        return $this->api('me/accounts', 'GET', $params);
     }
 
     /**
@@ -119,7 +120,7 @@ class Facebook extends OAuth2 implements SocialInterface
      */
     public function getUserAccount($id, array $params = array())
     {
-        return $this->api($id.'/accounts','GET',$params);
+        return $this->api($id . '/accounts', 'GET', $params);
     }
 
     /**
@@ -129,7 +130,7 @@ class Facebook extends OAuth2 implements SocialInterface
      */
     public function getMeTimeline(array $params = array())
     {
-        return $this->api('me/feed','GET',$params);
+        return $this->api('me/feed', 'GET', $params);
     }
 
     /**
@@ -140,7 +141,7 @@ class Facebook extends OAuth2 implements SocialInterface
      */
     public function getPagePosts($page_id, array $params = array())
     {
-        return $this->api($page_id.'/posts','GET',$params);
+        return $this->api($page_id . '/posts', 'GET', $params);
     }
 
     /**
@@ -151,7 +152,7 @@ class Facebook extends OAuth2 implements SocialInterface
      */
     public function getPostDetail($post_id, array $params = array())
     {
-        return $this->api($post_id,'GET',$params);
+        return $this->api($post_id, 'GET', $params);
     }
 
     /**
@@ -170,7 +171,7 @@ class Facebook extends OAuth2 implements SocialInterface
      */
     public function postToWall($object = 'me', array $params = array())
     {
-        return $this->api($object.'/feed','POST',$params);
+        return $this->api($object . '/feed', 'POST', $params);
     }
 
     /**
@@ -179,9 +180,9 @@ class Facebook extends OAuth2 implements SocialInterface
      * @param  array  $params    params for query
      * @return json              data
      */
-    public function getUserProfile($id,array $params = array())
+    public function getUserProfile($id, array $params = array())
     {
-        return $this->api($id,'GET',$params);
+        return $this->api($id, 'GET', $params);
     }
 
     /**
@@ -190,9 +191,20 @@ class Facebook extends OAuth2 implements SocialInterface
      * @param  array  $params    params for query
      * @return json              data
      */
-    public function getUserTimeline($id,array $params = array())
+    public function getUserTimeline($id, array $params = array())
     {
-        return $this->api($id.'/feed','GET',$params);
+        return $this->api($id . '/feed', 'GET', $params);
+    }
+
+    /**
+     * create Comment on post
+     * @param  int    $obj_id    node id of post
+     * @param  array  $params    params for query
+     * @return json              data
+     */
+    public function createComment($obj_id, array $params = array())
+    {
+        return $this->api($obj_id . '/comments', 'POST', $params);
     }
 
     /**
@@ -201,7 +213,7 @@ class Facebook extends OAuth2 implements SocialInterface
      * @param  array      $_params options for query
      * @return obj        OAuthToken object
      */
-    public function refreshAccessToken(OAuthToken $token,$_params = array())
+    public function refreshAccessToken(OAuthToken $token, $_params = array())
     {
         $params = [
             'client_id' => $this->clientId,
@@ -231,7 +243,7 @@ class Facebook extends OAuth2 implements SocialInterface
             'grant_type' => 'client_credentials',
         ];
         $response = $this->sendGetAppToken('GET', $this->tokenUrl, array_merge($defaultParams, $params));
-        parse_str($response,$params);
+        parse_str($response, $params);
 
         $token = $this->createToken(['params' => $params]);
         $this->setAccessToken($token);
@@ -273,7 +285,7 @@ class Facebook extends OAuth2 implements SocialInterface
         curl_close($curlResource);
 
         if ($errorNumber > 0) {
-            throw new Exception('Curl error requesting "' .  $url . '": #' . $errorNumber . ' - ' . $errorMessage);
+            throw new \Exception('Curl error requesting "' . $url . '": #' . $errorNumber . ' - ' . $errorMessage);
         }
         if (strncmp($responseHeaders['http_code'], '20', 2) !== 0) {
             throw new \yii\authclient\InvalidResponseException($responseHeaders, $response, 'Request failed with code: ' . $responseHeaders['http_code'] . ', message: ' . $response);
