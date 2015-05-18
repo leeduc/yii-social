@@ -8,7 +8,6 @@
 namespace leeduc\authclient\clients;
 
 use yii\authclient\OAuth2;
-use leeduc\authclient\SocialInterface;
 
 /**
  * GoogleOAuth allows authentication via Google OAuth.
@@ -61,6 +60,7 @@ class Youtube extends OAuth2
     public $refresh_token;
     public $id_token;
     public $expires_in;
+    public $api_key;
 
     /**
      * @inheritdoc
@@ -75,7 +75,7 @@ class Youtube extends OAuth2
                 'https://www.googleapis.com/auth/youtube.readonly',
                 'https://www.googleapis.com/auth/youtube.upload',
                 'https://www.googleapis.com/auth/youtubepartner',
-                'https://www.googleapis.com/auth/youtubepartner-channel-audit'
+                'https://www.googleapis.com/auth/youtubepartner-channel-audit',
             ]);
         }
     }
@@ -139,9 +139,9 @@ class Youtube extends OAuth2
      */
     public function getMeProfile(array $params = array())
     {
-        return $this->api('channels','GET',[
+        return $this->api('channels', 'GET', [
             'part' => 'snippet,contentDetails',
-            'mine' => 'true'
+            'mine' => 'true',
         ]);
     }
 
@@ -153,7 +153,7 @@ class Youtube extends OAuth2
     public function getMeTimeline(array $params = array())
     {
         $id = $this->getMeProfile()['items'][0]['id'];
-        return $this->api('search','GET',[
+        return $this->api('search', 'GET', [
             'part' => 'snippet',
             'channelId' => $id,
         ]);
@@ -165,7 +165,7 @@ class Youtube extends OAuth2
      */
     public function getHomeSuggest()
     {
-        return $this->api('playlists','GET',[
+        return $this->api('playlists', 'GET', [
             'part' => 'snippet',
             'home' => 'true',
         ]);
@@ -177,7 +177,7 @@ class Youtube extends OAuth2
      */
     public function getMyPlaylistInChannel()
     {
-        return $this->api('playlists','GET',[
+        return $this->api('playlists', 'GET', [
             'part' => 'snippet,contentDetails',
             'mine' => 'true',
         ]);
@@ -190,7 +190,7 @@ class Youtube extends OAuth2
      */
     public function getPlaylistInChannel($id)
     {
-        return $this->api('playlists','GET',[
+        return $this->api('playlists', 'GET', [
             'part' => 'snippet,contentDetails',
             'channelId' => $id,
         ]);
@@ -203,7 +203,7 @@ class Youtube extends OAuth2
      */
     public function getVideosInPlaylist($id)
     {
-        return $this->api('playlistItems','GET',[
+        return $this->api('playlistItems', 'GET', [
             'part' => 'snippet,contentDetails',
             'playlistId' => $id,
         ]);
@@ -215,7 +215,7 @@ class Youtube extends OAuth2
      */
     public function getMySubscription()
     {
-        return $this->api('subscriptions','GET',[
+        return $this->api('subscriptions', 'GET', [
             'part' => 'snippet,contentDetails,subscriberSnippet',
             'mySubscribers' => 'true',
         ]);
@@ -227,7 +227,7 @@ class Youtube extends OAuth2
      */
     public function getSubscription()
     {
-        return $this->api('subscriptions','GET',[
+        return $this->api('subscriptions', 'GET', [
             'part' => 'snippet,contentDetails,subscriberSnippet',
             'mine' => 'true',
         ]);
@@ -239,11 +239,12 @@ class Youtube extends OAuth2
      * @param  array  $params options for params
      * @return array          data
      */
-    public function getUserProfile($id,array $params = array())
+    public function getUserProfile($id, $user = true)
     {
-        return $this->api('channels','GET',[
+        return $this->api('channels', 'GET', [
             'part' => 'snippet,contentDetails',
-            'id' => $id
+            'forUsername' => $user ? $id : null,
+            'id' => !$user ? $id : null,
         ]);
     }
 
@@ -253,11 +254,11 @@ class Youtube extends OAuth2
      * @param  array  $params options for params
      * @return array          data
      */
-    public function getUserTimeline($id,array $params = array())
+    public function getUserTimeline($id, array $params = array())
     {
-        return $this->api('search','GET',[
+        return $this->api('search', 'GET', [
             'part' => 'snippet',
-            'channelId' => $id
+            'channelId' => $id,
         ]);
     }
 
@@ -269,7 +270,7 @@ class Youtube extends OAuth2
      */
     public function getPostDetail($post_id, array $params = array())
     {
-        return $this->api('videos', 'GET',[
+        return $this->api('videos', 'GET', [
             'part' => 'snippet,contentDetails,statistics',
             'id' => $post_id,
         ]);
