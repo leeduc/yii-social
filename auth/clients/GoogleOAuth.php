@@ -61,6 +61,7 @@ class GoogleOAuth extends OAuth2 implements SocialInterface
     public $refresh_token;
     public $id_token;
     public $expires_in;
+    public $api_key;
     /**
      * @inheritdoc
      */
